@@ -22,11 +22,13 @@ export default defineConfig({
     },
     commonjsOptions: {
       include: [/node_modules/]
-    }
+    },
+    assetsInlineLimit: 0
   },
   publicDir: 'public',
   assetsInclude: ['**/*.mjs'],
   optimizeDeps: {
     include: ['pdfjs-dist', 'antd', '@ant-design/icons']
-  }
+  },
+  base: './'
 })

@@ -1,0 +1,23 @@
+{
+  "headers": [
+    {
+      "source": "/(.*\\.mjs)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/pdf.worker.min.mjs",
+      "destination": "/pdf.worker.min.mjs"
+    }
+  ]
+}
