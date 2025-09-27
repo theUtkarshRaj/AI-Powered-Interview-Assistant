@@ -12,9 +12,9 @@ export interface ParsedResumeData {
 // Configure PDF.js worker with fallback options
 if (typeof window !== 'undefined') {
   try {
-    // Use jsdelivr CDN which is more reliable
+    // Use jsdelivr CDN with matching version (5.4.149)
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 
-      'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.149/build/pdf.worker.min.js';
   } catch (error) {
     console.warn('⚠️ PDF.js worker setup failed:', error);
   }
@@ -101,10 +101,11 @@ const parsePDF = async (file: File): Promise<string> => {
       }
     } catch (pdfError) {
       console.warn('PDF parsing with worker failed, trying without worker:', pdfError);
-      // Try without worker as fallback
+      // Try without worker as fallback - need to create a new ArrayBuffer
       try {
+        const newArrayBuffer = arrayBuffer.slice(); // Create a copy of the ArrayBuffer
         const pdf = await (pdfjsLib as any).getDocument({ 
-          data: arrayBuffer,
+          data: newArrayBuffer,
           useSystemFonts: true,
           disableWorker: true,
           verbosity: 0
