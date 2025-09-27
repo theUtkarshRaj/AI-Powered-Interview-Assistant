@@ -12,9 +12,9 @@ export interface ParsedResumeData {
 // Configure PDF.js worker with fallback options
 if (typeof window !== 'undefined') {
   try {
-    // Use a reliable CDN worker source
+    // Use jsdelivr CDN which is more reliable
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.mjs';
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   } catch (error) {
     console.warn('⚠️ PDF.js worker setup failed:', error);
   }
@@ -100,6 +100,40 @@ const parsePDF = async (file: File): Promise<string> => {
         return fullText;
       }
     } catch (pdfError) {
+      console.warn('PDF parsing with worker failed, trying without worker:', pdfError);
+      // Try without worker as fallback
+      try {
+        const pdf = await (pdfjsLib as any).getDocument({ 
+          data: arrayBuffer,
+          useSystemFonts: true,
+          disableWorker: true,
+          verbosity: 0
+        }).promise;
+        
+        let fullText = '';
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          try {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items
+              .map((item: any) => item.str || item.text || '')
+              .filter((str: string) => str.trim().length > 0)
+              .join(' ');
+            
+            if (pageText.trim()) {
+              fullText += pageText + '\n';
+            }
+          } catch (pageError) {
+            continue;
+          }
+        }
+        
+        if (fullText.trim()) {
+          return fullText.trim();
+        }
+      } catch (fallbackError) {
+        console.warn('PDF parsing fallback also failed:', fallbackError);
+      }
     }
 
     // Fallback: Use filename to extract basic info
