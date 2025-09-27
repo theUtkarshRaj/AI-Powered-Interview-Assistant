@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Upload, Button, Form, Input, Card, message, Alert } from 'antd'
+import { Upload, Button, Form, Input, Card, Alert, App } from 'antd'
 import { InboxOutlined, UserOutlined, MailOutlined, PhoneOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useDispatch } from 'react-redux'
 import { addCandidate, setCurrentCandidate, clearCurrentCandidate } from '../store/candidateSlice'
@@ -19,6 +19,7 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onUploadComplete }) => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
   const { handleError } = useErrorHandler()
+  const { message } = App.useApp()
   const isMobile = window.innerWidth < 768
   
   const [uploading, setUploading] = useState(false)
@@ -118,7 +119,7 @@ const ResumeUpload: React.FC<ResumeUploadProps> = ({ onUploadComplete }) => {
       <div className="w-full max-w-4xl h-[90vh]">
         <Card 
           className="shadow-2xl border-0 rounded-2xl overflow-hidden h-full"
-          bodyStyle={{ padding: 0, height: '100%' }}
+          styles={{ body: { padding: 0, height: '100%' } }}
         >
           {/* Header Section */}
           <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white">

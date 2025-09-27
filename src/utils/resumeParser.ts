@@ -9,10 +9,10 @@ export interface ParsedResumeData {
   text: string;
 }
 
-// Configure PDF.js worker with local file path
+// Configure PDF.js worker with fallback options
 if (typeof window !== 'undefined') {
   try {
-    // Use local worker file to avoid CDN issues
+    // Use local worker file first, then fallback to CDN
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
   } catch (error) {
     console.warn('⚠️ PDF.js worker setup failed:', error);
@@ -70,7 +70,9 @@ const parsePDF = async (file: File): Promise<string> => {
     try {
       const pdf = await (pdfjsLib as any).getDocument({ 
         data: arrayBuffer,
-        useSystemFonts: true
+        useSystemFonts: true,
+        disableWorker: false,
+        verbosity: 0
       }).promise;
       
       let fullText = '';

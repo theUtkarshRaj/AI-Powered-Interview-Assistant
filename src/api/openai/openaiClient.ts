@@ -27,7 +27,6 @@ class OpenAIClient {
       }
     }
 
-
     try {
       const response = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
@@ -50,6 +49,17 @@ class OpenAIClient {
         throw new Error('Invalid response format from OpenAI API')
       }
     } catch (error) {
+      // Handle CORS and network errors gracefully
+      if (error instanceof Error) {
+        if (error.message.includes('CORS') || error.message.includes('fetch')) {
+          return {
+            content: 'AI service is temporarily unavailable due to network restrictions. Using fallback mode.',
+            success: false,
+            error: 'Network/CORS error - using fallback'
+          }
+        }
+      }
+      
       return {
         content: 'Sorry, I encountered an error processing your request. Please try again.',
         success: false,

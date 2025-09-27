@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
@@ -8,5 +9,24 @@ export default defineConfig({
   },
   define: {
     global: 'globalThis',
+    'process.env': {}
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'pdf-worker': ['pdfjs-dist'],
+          'antd': ['antd', '@ant-design/icons']
+        }
+      }
+    },
+    commonjsOptions: {
+      include: [/node_modules/]
+    }
+  },
+  publicDir: 'public',
+  assetsInclude: ['**/*.mjs'],
+  optimizeDeps: {
+    include: ['pdfjs-dist', 'antd', '@ant-design/icons']
   }
 })
