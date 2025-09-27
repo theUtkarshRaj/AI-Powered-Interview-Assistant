@@ -38,14 +38,17 @@ export const parseResume = async (file: File): Promise<ParsedResumeData> => {
         const aiRequest: OpenAIResumeParseRequest = { text, fileName: file.name };
         const aiResult = await openaiResumeParser.parseResumeWithAI(aiRequest);
         
-        if (aiResult.success && aiResult.name) {
+        if (aiResult.success && aiResult.name && aiResult.name.trim().length > 0) {
+          console.log('✅ OpenAI parsing successful:', aiResult);
           return { name: aiResult.name, email: aiResult.email, phone: aiResult.phone, text };
         } else {
+          console.warn('⚠️ OpenAI extraction completed, but name not found. Using regex fallback.');
         }
       } catch (aiError) {
         console.warn('⚠️ OpenAI parsing error, using regex fallback:', aiError);
       }
     } else {
+      console.warn('⚠️ No text extracted from resume, using regex fallback.');
     }
 
     // Regex fallback
@@ -141,30 +144,40 @@ const regexFallback = (text: string): ParsedResumeData => {
     }
   }
 
-  // Name extraction - look in first 10 lines
+  // Name extraction - look in first 15 lines with better patterns
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   let name = '';
   
-  for (let i = 0; i < Math.min(10, lines.length); i++) {
+  for (let i = 0; i < Math.min(15, lines.length); i++) {
     const line = lines[i];
     
-    // Skip common headers
-    if (/^(resume|cv|curriculum vitae|personal information|contact information)$/i.test(line)) {
+    // Skip common headers and empty lines
+    if (/^(resume|cv|curriculum vitae|personal information|contact information|phone|email|address)$/i.test(line) || 
+        line.length < 3) {
       continue;
     }
     
-    // Look for name pattern
+    // Look for name pattern - more flexible
     if (
       line.length >= 3 &&
-      line.length <= 50 &&
+      line.length <= 60 &&
       !line.includes('@') &&
       !/\d{3,}/.test(line) &&
-      /^[A-Za-z\s\-\.]+$/.test(line) &&
-      line.split(' ').length >= 2 &&
-      line.split(' ').length <= 4
+      /^[A-Za-z\s\-\.']+$/.test(line) &&
+      line.split(' ').length >= 1 &&
+      line.split(' ').length <= 5 &&
+      !/^(mr|mrs|ms|dr|prof|engr|mr\.|mrs\.|ms\.|dr\.|prof\.|engr\.)$/i.test(line.split(' ')[0])
     ) {
       name = line;
       break;
+    }
+  }
+  
+  // If still no name found, try extracting from filename
+  if (!name && text.includes('Resume:')) {
+    const match = text.match(/Resume:\s*([^.]+)/);
+    if (match && match[1]) {
+      name = match[1].trim();
     }
   }
   

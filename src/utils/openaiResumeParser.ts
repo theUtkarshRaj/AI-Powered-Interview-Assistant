@@ -57,15 +57,15 @@ export class OpenAIResumeParser {
    * Stronger prompt: force strict JSON output
    */
   private buildResumeParsePrompt(text: string, fileName?: string): string {
-    return `You are a precise resume parser. 
-Extract NAME, EMAIL, PHONE, and CONFIDENCE from the resume text below.
+    return `You are an expert resume parser. Extract the candidate's NAME, EMAIL, PHONE, and CONFIDENCE from the resume text below.
 
-Return a SINGLE VALID JSON object only, no extra words, no markdown:
+IMPORTANT: Return ONLY a valid JSON object, no other text or markdown:
+
 {
-  "name": "",
-  "email": "",
-  "phone": "",
-  "confidence": 0
+  "name": "Full Name Here",
+  "email": "email@example.com",
+  "phone": "+1234567890",
+  "confidence": 85
 }
 
 Resume file: ${fileName ?? '[unknown]'}
@@ -74,11 +74,13 @@ Resume file: ${fileName ?? '[unknown]'}
 ${text}
 ---END RESUME TEXT---
 
-Rules:
-- name: Full name only (not company/job title)
-- email: Best-matching email address or empty string
-- phone: Best-matching phone number or empty string
-- confidence: Integer 0–100 representing confidence in name extraction`
+EXTRACTION RULES:
+- name: Extract the candidate's full name (first + last name, not company names or job titles)
+- email: Find the primary email address (look for @ symbol)
+- phone: Find any phone number (various formats accepted)
+- confidence: Rate 0-100 based on how clearly the name appears (higher = more confident)
+
+Look carefully at the beginning of the resume for the name. It's usually the first or second line.`
   }
 
   /**
