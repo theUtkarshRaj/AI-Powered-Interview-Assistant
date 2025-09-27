@@ -2,6 +2,9 @@ import * as pdfjsLib from "pdfjs-dist";
 import * as mammoth from "mammoth";
 import { openaiResumeParser, OpenAIResumeParseRequest } from './openaiResumeParser';
 
+// Import PDF worker properly
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
+
 export interface ParsedResumeData {
   name: string;
   email: string;
@@ -9,11 +12,11 @@ export interface ParsedResumeData {
   text: string;
 }
 
-// Configure PDF.js worker - disable worker completely
+// Configure PDF.js worker properly
 if (typeof window !== 'undefined') {
   try {
-    // Disable worker completely to avoid CORS issues
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 'data:application/javascript;base64,';
+    // Set worker source to the imported worker URL
+    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfWorker;
   } catch (error) {
     console.warn('⚠️ PDF.js worker setup failed:', error);
   }
@@ -66,12 +69,12 @@ const parsePDF = async (file: File): Promise<string> => {
   try {
     const arrayBuffer = await file.arrayBuffer();
     
-    // Try PDF parsing without worker
+    // Try PDF parsing with worker
     try {
       const pdf = await (pdfjsLib as any).getDocument({ 
         data: arrayBuffer,
         useSystemFonts: true,
-        disableWorker: true,
+        disableWorker: false,
         verbosity: 0
       }).promise;
       
