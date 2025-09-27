@@ -175,16 +175,16 @@ The app uses OpenAI's GPT models for:
 ## 📸 Screenshots
 
 ### Homepage
-![Homepage](https://via.placeholder.com/800x400?text=Homepage+Interface)
+![Homepage](Images/homepage.png)
 
 ### Interview Interface
-![Interview](https://via.placeholder.com/800x400?text=Interview+Chat+Interface)
+![Interview](Images/interview.png)
 
 ### Dashboard
-![Dashboard](https://via.placeholder.com/800x400?text=Interviewer+Dashboard)
+![Dashboard](Images/dashboard.png)
 
 ### Resume Upload
-![Resume Upload](https://via.placeholder.com/800x400?text=Resume+Upload+Form)
+![Resume Upload](Images/form.png)
 
 ## 🎯 Key Features Implemented
 
