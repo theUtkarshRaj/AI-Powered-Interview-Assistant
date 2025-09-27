@@ -9,11 +9,12 @@ export interface ParsedResumeData {
   text: string;
 }
 
-// Configure PDF.js worker - disable worker to avoid version issues
+// Configure PDF.js worker - use a valid worker source
 if (typeof window !== 'undefined') {
   try {
-    // Disable worker to avoid version mismatch issues
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = false;
+    // Use a valid worker source
+    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 
+      'https://unpkg.com/pdfjs-dist@5.4.149/build/pdf.worker.min.js';
   } catch (error) {
     console.warn('⚠️ PDF.js worker setup failed:', error);
   }
@@ -66,12 +67,12 @@ const parsePDF = async (file: File): Promise<string> => {
   try {
     const arrayBuffer = await file.arrayBuffer();
     
-    // Try PDF parsing without worker
+    // Try PDF parsing with worker
     try {
       const pdf = await (pdfjsLib as any).getDocument({ 
         data: arrayBuffer,
         useSystemFonts: true,
-        disableWorker: true,
+        disableWorker: false,
         verbosity: 0
       }).promise;
       
