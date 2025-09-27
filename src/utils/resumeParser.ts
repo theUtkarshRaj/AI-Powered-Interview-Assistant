@@ -12,32 +12,9 @@ export interface ParsedResumeData {
 // Configure PDF.js worker with fallback options
 if (typeof window !== 'undefined') {
   try {
-    // Try multiple worker sources for better deployment compatibility
-    const workerSources = [
-      './pdf.worker.min.mjs',
-      '/pdf.worker.min.mjs',
-      'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.mjs',
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.mjs'
-    ];
-    
-    // Set the first source as default
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = workerSources[0];
-    
-    // Add error handling for worker loading
-    const originalWorkerSrc = (pdfjsLib as any).GlobalWorkerOptions.workerSrc;
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = async () => {
-      for (const source of workerSources) {
-        try {
-          const response = await fetch(source, { method: 'HEAD' });
-          if (response.ok) {
-            return source;
-          }
-        } catch (e) {
-          continue;
-        }
-      }
-      return originalWorkerSrc;
-    };
+    // Use CDN worker as primary source for better deployment compatibility
+    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 
+      'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.mjs';
   } catch (error) {
     console.warn('⚠️ PDF.js worker setup failed:', error);
   }

@@ -23,7 +23,8 @@ export default defineConfig({
     commonjsOptions: {
       include: [/node_modules/]
     },
-    assetsInlineLimit: 0
+    assetsInlineLimit: 0,
+    copyPublicDir: true
   },
   publicDir: 'public',
   assetsInclude: ['**/*.mjs'],
