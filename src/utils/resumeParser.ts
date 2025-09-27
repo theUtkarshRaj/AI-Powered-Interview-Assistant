@@ -13,7 +13,7 @@ export interface ParsedResumeData {
 if (typeof window !== 'undefined') {
   try {
     // Disable worker completely to avoid CORS issues
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = null;
+    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '';
   } catch (error) {
     console.warn('⚠️ PDF.js worker setup failed:', error);
   }
