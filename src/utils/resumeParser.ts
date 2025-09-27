@@ -12,9 +12,9 @@ export interface ParsedResumeData {
 // Configure PDF.js worker with fallback options
 if (typeof window !== 'undefined') {
   try {
-    // Use CDN worker as primary source for better deployment compatibility
+    // Use a reliable CDN worker source
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 
-      'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.mjs';
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.mjs';
   } catch (error) {
     console.warn('⚠️ PDF.js worker setup failed:', error);
   }

@@ -15,7 +15,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'pdf-worker': ['pdfjs-dist'],
           'antd': ['antd', '@ant-design/icons']
         }
       }
