@@ -9,12 +9,11 @@ export interface ParsedResumeData {
   text: string;
 }
 
-// Configure PDF.js worker with fallback options
+// Configure PDF.js worker - disable worker to avoid version issues
 if (typeof window !== 'undefined') {
   try {
-    // Use jsdelivr CDN with matching version (5.4.149)
-    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = 
-      'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.149/build/pdf.worker.min.js';
+    // Disable worker to avoid version mismatch issues
+    (pdfjsLib as any).GlobalWorkerOptions.workerSrc = false;
   } catch (error) {
     console.warn('⚠️ PDF.js worker setup failed:', error);
   }
@@ -67,12 +66,12 @@ const parsePDF = async (file: File): Promise<string> => {
   try {
     const arrayBuffer = await file.arrayBuffer();
     
-    // Try PDF parsing with proper worker
+    // Try PDF parsing without worker
     try {
       const pdf = await (pdfjsLib as any).getDocument({ 
         data: arrayBuffer,
         useSystemFonts: true,
-        disableWorker: false,
+        disableWorker: true,
         verbosity: 0
       }).promise;
       
@@ -100,41 +99,7 @@ const parsePDF = async (file: File): Promise<string> => {
         return fullText;
       }
     } catch (pdfError) {
-      console.warn('PDF parsing with worker failed, trying without worker:', pdfError);
-      // Try without worker as fallback - need to create a new ArrayBuffer
-      try {
-        const newArrayBuffer = arrayBuffer.slice(); // Create a copy of the ArrayBuffer
-        const pdf = await (pdfjsLib as any).getDocument({ 
-          data: newArrayBuffer,
-          useSystemFonts: true,
-          disableWorker: true,
-          verbosity: 0
-        }).promise;
-        
-        let fullText = '';
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          try {
-            const page = await pdf.getPage(pageNum);
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items
-              .map((item: any) => item.str || item.text || '')
-              .filter((str: string) => str.trim().length > 0)
-              .join(' ');
-            
-            if (pageText.trim()) {
-              fullText += pageText + '\n';
-            }
-          } catch (pageError) {
-            continue;
-          }
-        }
-        
-        if (fullText.trim()) {
-          return fullText.trim();
-        }
-      } catch (fallbackError) {
-        console.warn('PDF parsing fallback also failed:', fallbackError);
-      }
+      console.warn('PDF parsing failed:', pdfError);
     }
 
     // Fallback: Use filename to extract basic info
