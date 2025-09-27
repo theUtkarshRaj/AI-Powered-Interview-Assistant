@@ -121,3 +121,17 @@ dist-ssr
 
 # Optional: Uncomment if you want to ignore yarn.lock
 # yarn.lock
+
+# Exclude all text files except README.md
+*.txt
+*.md
+!README.md
+
+# Exclude documentation files
+DEPLOYMENT.md
+GITHUB_SETUP.md
+deploy.sh
+
+# Exclude environment example files
+env.example
+.env.example
